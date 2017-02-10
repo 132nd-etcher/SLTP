@@ -9,5 +9,6 @@ setup(
     author='132nd-etcher',
     url='https://github.com/132nd-etcher/sltp',
     packages=['sltp', 'tests'],
-    requires=['mpmath']
+    requires=['mpmath'],
+    dependency_links = ['https://github.com/132nd-etcher/utils.git#egg=utils-0.0.1']
 )

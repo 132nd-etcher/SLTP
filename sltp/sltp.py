@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 import mpmath
 
-from src.utils.custom_logging import make_logger
+from utils.custom_logging import make_logger
 
 LOGGER = make_logger(__name__)
 
