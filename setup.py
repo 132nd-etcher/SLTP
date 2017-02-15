@@ -2,7 +2,7 @@
 
 from setuptools import setup
 
-
+# noinspection SpellCheckingInspection
 setup(
     name='SLTP',
     version='0.0.2',

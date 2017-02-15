@@ -129,7 +129,7 @@ class SLTP:
             try:
                 int(dict_name)
                 s += ' -- end of [{}]'.format(dict_name)
-            except:
+            except (ValueError, TypeError):
                 if dict_name is None:
                     s += ' -- end of mission'
                 else:
@@ -295,7 +295,7 @@ class SLTP:
             return 0
         try:
             return int(n, 0)
-        except:
+        except ValueError:
             pass
         return mpmath.mpf(n)
 
