@@ -165,7 +165,11 @@ class SLTP:
         if not self.ch:
             return
         if self.ch == '{':
-            return self.object()
+            o = self.object()
+            ret = OrderedDict()
+            for k in natsorted(o.keys()):
+                ret[k] = o[k]
+            return ret
         if self.ch == '[':
             self.next_chr()
         if self.ch in ['"', "'", '[']:
