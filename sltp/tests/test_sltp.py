@@ -10,7 +10,10 @@ from sltp import SLTP
 @pytest.fixture()
 def remove_output():
     yield
-    os.remove('./output')
+    try:
+        os.remove('./output')
+    except FileNotFoundError:
+        pass
 
 
 # noinspection PyUnusedLocal, PyShadowingNames
