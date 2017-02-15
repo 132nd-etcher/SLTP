@@ -4,7 +4,7 @@ import re
 from collections import OrderedDict
 
 import mpmath
-
+from natsort import natsorted
 from utils.custom_logging import make_logger
 
 LOGGER = make_logger(__name__)
@@ -104,6 +104,10 @@ class SLTP:
         elif isinstance(obj, (int, float, complex, mpmath.mpf)):
             s += str(obj)
         elif isinstance(obj, (list, tuple, dict)):
+            # Ladies and gentlemen, please take a minute to behold the following code.
+            # Breathe slowly, let it sink in for a minute.
+            # Yes, I agree, this sucks *so* much I should hang for it.
+            # Now, deal with it ^^
             self.depth += 1
             # noinspection PyTypeChecker
             if not isinstance(obj, dict) and len(filter(
@@ -113,12 +117,14 @@ class SLTP:
             dp = tab * self.depth
             s += '%s%s{%s' % (newline, tab * (self.depth - 1), newline if len(obj) > 0 else '')
             if isinstance(obj, dict):
-                s += (',%s' % newline).join([dp + '[{}] ={}{}'.format(k,
-                                                                      '' if isinstance(v, (list, tuple, dict)) else ' ',
-                                                                      self.__encode(v, k)) if type(
-                    k) is int else dp + '["{}"] ={}{}'.format(k, '' if isinstance(v, (list, tuple, dict)) else ' ',
-                                                              self.__encode(v, k))
-                                             for k, v in obj.items()])
+                s += (',%s' % newline).join(
+                    [dp + '[{}] ={}{}'.format(k,
+                                              '' if isinstance(obj[k], (list, tuple, dict)) else ' ',
+                                              self.__encode(obj[k], k)) if type(
+                        k) is int else dp + '["{}"] ={}{}'.format(k, '' if isinstance(obj[k],
+                                                                                      (list, tuple, dict)) else ' ',
+                                                                  self.__encode(obj[k], k))
+                     for k in natsorted(obj.keys(), key=str)])
             else:
                 s += (',%s' % newline).join([dp + self.__encode(el) for el in obj])
             self.depth -= 1
