@@ -54,11 +54,11 @@ class SLTP:
         self.tab = '    '
 
     def decode(self, text):
-        """Decode a Lua string to an Ordered Dictionary object
+        """Decode a Lua string to an dictionary
         :type text: str
-        :rtype: OrderedDict
+        :rtype: dict
         :param text: string to decode
-        :return: Ordered Dictionary
+        :return: dictionary
         """
         logger.debug('decoding text to dictionary')
 
@@ -179,7 +179,7 @@ class SLTP:
             return
         if self.ch == '{':
             o = self.object()
-            ret = OrderedDict()
+            ret = dict()
             for k in natsorted(o.keys()):
                 ret[k] = o[k]
             return ret
@@ -212,7 +212,7 @@ class SLTP:
 
     # noinspection PyMissingOrEmptyDocstring
     def object(self):
-        o = OrderedDict()
+        o = dict()
         k = ''
         idx = 0
         numeric_keys = False
