@@ -45,6 +45,7 @@ class SLTP:
         self.at = 0
         self.len = 0
         self.depth = 0
+        self.qual = None
         self.space = re.compile('\s', re.M)
         self.alnum = re.compile('\w', re.M)
         self.line_end = re.compile(r'^(?P<intro>[ \t]*\})(?P<comment> -- end of \[.*\]),$')
@@ -62,9 +63,22 @@ class SLTP:
         LOGGER.debug('decoding text to dictionnary')
         if not text or type(text) is not str:
             raise SLTPErrors.ParsingError(ERRORS['unexp_type_str'])
-        # FIXME: only short comments removed
-        reg = re.compile(' --.*$', re.M)
+
+
+
+        logger.debug('extracting qualifier')
+        qual = re.compile(r'^(?P<value>(dictionary|mission)) =\n')
+        match = qual.match(text)
+
+        if match is None:
+            raise ValueError('qualifier not found; first line: {}'.format(text.split('\n')[0]))
+
+        self.qual = match.group('value')
+        text = qual.sub('', text)
+
+        reg = re.compile(r' -- .*[^\\]$', re.M)
         text = reg.sub('', text)
+
         self.text = text
         self.at, self.ch, self.depth = 0, '', 0
         self.len = len(text)
@@ -82,16 +96,16 @@ class SLTP:
             LOGGER.error('missing object to encode')  # TODO manage error
             return
         self.depth = 0
+        out = []
         s = self.__encode(obj)
         lines = s.split(self.newline)
-        out = []
         for line in lines:
             m = self.line_end.match(line)
             if m:
-                out.append(''.join([m.group('intro'), ',', m.group('comment'), ]))
+                out.append('{},{}'.format(m.group('intro'), m.group('comment')))
             else:
                 out.append(line)
-        return self.newline.join(out)
+        return '{qual} ={content} -- end of {qual}\n'.format(qual=self.qual, content=self.newline.join(out))
 
     def __encode(self, obj, dict_name=None):
         s = ''
@@ -136,9 +150,7 @@ class SLTP:
                 int(dict_name)
                 s += ' -- end of [{}]'.format(dict_name)
             except (ValueError, TypeError):
-                if dict_name is None:
-                    s += ' -- end of mission'
-                else:
+                if dict_name is not None:
                     s += ' -- end of ["{}"]'.format(dict_name)
         return s
 

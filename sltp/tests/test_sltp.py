@@ -5,28 +5,25 @@ import os
 import pytest
 
 from sltp import SLTP
+from .test_tables import test_tables
 
 
 @pytest.fixture()
 def remove_output():
-    yield
-    try:
-        os.remove('./output')
-    except FileNotFoundError:
-        pass
+    success = yield
+    if success:
+        try:
+            os.remove('./output')
+        except FileNotFoundError:
+            pass
 
 
-# noinspection PyUnusedLocal, PyShadowingNames
-def test_sltp(remove_output):
+@pytest.mark.parametrize('test_table', test_tables)
+def test_encode_decode(test_table):
     parser = SLTP()
 
-    with open('./sltp/tests/test_table', encoding='iso8859_15') as f:
-        decoded_data = parser.decode('\n'.join(f.readlines()[1:]))
+    decoded_data = parser.decode(test_table)
 
     encoded_data = parser.encode(decoded_data)
 
-    with open('./output', encoding='iso8859_15', mode='w') as f:
-        f.write('mission =' + encoded_data + '\n')
-
-    with open('./output', encoding='iso8859_15') as out, open('./sltp/tests/test_table', encoding='iso8859_15') as in_:
-        assert in_.readlines() == out.readlines()
+    assert encoded_data == test_table
