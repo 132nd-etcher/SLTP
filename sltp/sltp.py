@@ -7,7 +7,7 @@ import mpmath
 from natsort import natsorted
 from utils.custom_logging import make_logger
 
-LOGGER = make_logger(__name__)
+logger = make_logger(__name__)
 
 ERRORS = {
     'unexp_type_str': 'decoding error: string expected',
@@ -39,12 +39,13 @@ class SLTP:
     """Simple Lua Python Parser"""
 
     def __init__(self):
-        LOGGER.debug('instantiating parser')
+        logger.debug('instantiating parser')
         self.text = ''
         self.ch = ''
         self.at = 0
         self.len = 0
         self.depth = 0
+        self.qual = None
         self.space = re.compile('\s', re.M)
         self.alnum = re.compile('\w', re.M)
         self.line_end = re.compile(r'^(?P<intro>[ \t]*\})(?P<comment> -- end of \[.*\]),$')
@@ -59,12 +60,26 @@ class SLTP:
         :param text: string to decode
         :return: Ordered Dictionary
         """
-        LOGGER.debug('decoding text to dictionnary')
+        logger.debug('decoding text to dictionary')
+
         if not text or type(text) is not str:
             raise SLTPErrors.ParsingError(ERRORS['unexp_type_str'])
-        # FIXME: only short comments removed
-        reg = re.compile(' --.*$', re.M)
+
+
+
+        logger.debug('extracting qualifier')
+        qual = re.compile(r'^(?P<value>(dictionary|mission)) =\n')
+        match = qual.match(text)
+
+        if match is None:
+            raise ValueError('qualifier not found; first line: {}'.format(text.split('\n')[0]))
+
+        self.qual = match.group('value')
+        text = qual.sub('', text)
+
+        reg = re.compile(r' -- .*[^\\]$', re.M)
         text = reg.sub('', text)
+
         self.text = text
         self.at, self.ch, self.depth = 0, '', 0
         self.len = len(text)
@@ -77,21 +92,21 @@ class SLTP:
         :param obj: object to encode
         :return: valid Lua string
         """
-        LOGGER.debug('encoding dictionary to text')
+        logger.debug('encoding dictionary to text')
         if not obj:
-            LOGGER.error('missing object to encode')  # TODO manage error
+            logger.error('missing object to encode')  # TODO manage error
             return
         self.depth = 0
+        out = []
         s = self.__encode(obj)
         lines = s.split(self.newline)
-        out = []
         for line in lines:
             m = self.line_end.match(line)
             if m:
-                out.append(''.join([m.group('intro'), ',', m.group('comment'), ]))
+                out.append('{},{}'.format(m.group('intro'), m.group('comment')))
             else:
                 out.append(line)
-        return self.newline.join(out)
+        return '{qual} ={content} -- end of {qual}\n'.format(qual=self.qual, content=self.newline.join(out))
 
     def __encode(self, obj, dict_name=None):
         s = ''
@@ -136,9 +151,7 @@ class SLTP:
                 int(dict_name)
                 s += ' -- end of [{}]'.format(dict_name)
             except (ValueError, TypeError):
-                if dict_name is None:
-                    s += ' -- end of mission'
-                else:
+                if dict_name is not None:
                     s += ' -- end of ["{}"]'.format(dict_name)
         return s
 
