@@ -1,7 +1,6 @@
 # coding=utf-8
 """Simple Lua Python Parser"""
 import re
-from collections import OrderedDict
 
 import mpmath
 from natsort import natsorted
@@ -9,6 +8,7 @@ from utils.custom_logging import make_logger
 
 logger = make_logger(__name__)
 
+# noinspection SpellCheckingInspection
 ERRORS = {
     'unexp_type_str': 'decoding error: string expected',
     'unexp_end_string': 'Unexpected end of string while parsing Lua string.',
@@ -54,18 +54,16 @@ class SLTP:
         self.tab = '    '
 
     def decode(self, text):
-        """Decode a Lua string to an Ordered Dictionary object
+        """Decode a Lua string to an dictionary
         :type text: str
-        :rtype: OrderedDict
+        :rtype: dict
         :param text: string to decode
-        :return: Ordered Dictionary
+        :return: dictionary
         """
         logger.debug('decoding text to dictionary')
 
         if not text or type(text) is not str:
             raise SLTPErrors.ParsingError(ERRORS['unexp_type_str'])
-
-
 
         logger.debug('extracting qualifier')
         qual = re.compile(r'^(?P<value>(dictionary|mission)) =\n')
@@ -179,7 +177,7 @@ class SLTP:
             return
         if self.ch == '{':
             o = self.object()
-            ret = OrderedDict()
+            ret = dict()
             for k in natsorted(o.keys()):
                 ret[k] = o[k]
             return ret
@@ -212,7 +210,7 @@ class SLTP:
 
     # noinspection PyMissingOrEmptyDocstring
     def object(self):
-        o = OrderedDict()
+        o = dict()
         k = ''
         idx = 0
         numeric_keys = False

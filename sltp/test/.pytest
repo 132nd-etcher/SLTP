@@ -1,0 +1,6 @@
+[pytest]
+testpaths = sltp/test
+addopts = --cov=sltp --cov-config sltp/test/.coveragerc --cov-report xml --cov-report html --durations=10 --pep8
+pep8ignore =
+    *.py E501
+    sltp/test/test_tables.py
