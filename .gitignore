@@ -1,5 +1,7 @@
-.idea/
 .cache
+.idea
 .hypothesis/
 __pycache__
-
+/.coverage
+/coverage.xml
+/sltp/test/coverage/
