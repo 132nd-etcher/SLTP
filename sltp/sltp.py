@@ -1,7 +1,6 @@
 # coding=utf-8
 """Simple Lua Python Parser"""
 import re
-from collections import OrderedDict
 
 import mpmath
 from natsort import natsorted
@@ -9,6 +8,7 @@ from utils.custom_logging import make_logger
 
 logger = make_logger(__name__)
 
+# noinspection SpellCheckingInspection
 ERRORS = {
     'unexp_type_str': 'decoding error: string expected',
     'unexp_end_string': 'Unexpected end of string while parsing Lua string.',
@@ -64,8 +64,6 @@ class SLTP:
 
         if not text or type(text) is not str:
             raise SLTPErrors.ParsingError(ERRORS['unexp_type_str'])
-
-
 
         logger.debug('extracting qualifier')
         qual = re.compile(r'^(?P<value>(dictionary|mission)) =\n')
