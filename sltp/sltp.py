@@ -7,7 +7,7 @@ import mpmath
 from natsort import natsorted
 from utils.custom_logging import make_logger
 
-LOGGER = make_logger(__name__)
+logger = make_logger(__name__)
 
 ERRORS = {
     'unexp_type_str': 'decoding error: string expected',
@@ -39,7 +39,7 @@ class SLTP:
     """Simple Lua Python Parser"""
 
     def __init__(self):
-        LOGGER.debug('instantiating parser')
+        logger.debug('instantiating parser')
         self.text = ''
         self.ch = ''
         self.at = 0
@@ -60,7 +60,8 @@ class SLTP:
         :param text: string to decode
         :return: Ordered Dictionary
         """
-        LOGGER.debug('decoding text to dictionnary')
+        logger.debug('decoding text to dictionary')
+
         if not text or type(text) is not str:
             raise SLTPErrors.ParsingError(ERRORS['unexp_type_str'])
 
@@ -91,9 +92,9 @@ class SLTP:
         :param obj: object to encode
         :return: valid Lua string
         """
-        LOGGER.debug('encoding dictionary to text')
+        logger.debug('encoding dictionary to text')
         if not obj:
-            LOGGER.error('missing object to encode')  # TODO manage error
+            logger.error('missing object to encode')  # TODO manage error
             return
         self.depth = 0
         out = []
