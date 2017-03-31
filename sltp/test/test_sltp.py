@@ -16,13 +16,19 @@ def test_encode_decode_files(test_file):
     parser = SLTP()
     with open(test_file, encoding=ENCODING) as f:
         data = f.read()
-    decoded_data = parser.decode(data)
-    encoded_data = parser.encode(decoded_data)
+    decoded_data, qualifier = parser.decode(data)
+
+    parser = SLTP()
+    encoded_data = parser.encode(decoded_data, qualifier)
 
     output = encoded_data.split('\n')
     input = data.split('\n')
 
     for x in input:
-        assert x in output
+        try:
+            assert x in output
+        except AssertionError:
+            print(x)
+            raise
 
     assert len(input) == len(output)
