@@ -1,30 +1,28 @@
 # coding=utf-8
 
 import os
-import time
 
 import pytest
 
 from sltp import SLTP
-from .test_tables import test_tables
+
+TEST_FILES_DIR = './sltp/test/test_files'
+ENCODING = 'iso8859_15'
 
 
-@pytest.fixture()
-def remove_output():
-    success = yield
-    if success:
-        try:
-            os.remove('./output')
-        except FileNotFoundError:
-            pass
-
-
-@pytest.mark.parametrize('test_table', test_tables)
-def test_encode_decode(test_table):
+@pytest.mark.parametrize('test_file', os.listdir(TEST_FILES_DIR))
+def test_encode_decode_files(test_file):
+    test_file = os.path.join(TEST_FILES_DIR, test_file)
     parser = SLTP()
-
-    decoded_data = parser.decode(test_table)
-
+    with open(test_file, encoding=ENCODING) as f:
+        data = f.read()
+    decoded_data = parser.decode(data)
     encoded_data = parser.encode(decoded_data)
 
-    assert encoded_data == test_table
+    output = encoded_data.split('\n')
+    input = data.split('\n')
+
+    for x in input:
+        assert x in output
+
+    assert len(input) == len(output)
