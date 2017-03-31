@@ -66,7 +66,7 @@ class SLTP:
             raise SLTPErrors.ParsingError(ERRORS['unexp_type_str'])
 
         logger.debug('extracting qualifier')
-        qual = re.compile(r'^(?P<value>(dictionary|mission)) =\n')
+        qual = re.compile(r'^(?P<value>(dictionary|mission)) = ?\n')
         match = qual.match(text)
 
         if match is None:
@@ -83,9 +83,9 @@ class SLTP:
         self.len = len(text)
         self.next_chr()
         result = self.value()
-        return result
+        return result, self.qual
 
-    def encode(self, obj):
+    def encode(self, obj, qualifier):
         """Encodes a dictionary-like object to a Lua string
         :param obj: object to encode
         :return: valid Lua string
@@ -104,7 +104,7 @@ class SLTP:
                 out.append('{},{}'.format(m.group('intro'), m.group('comment')))
             else:
                 out.append(line)
-        return '{qual} ={content} -- end of {qual}\n'.format(qual=self.qual, content=self.newline.join(out))
+        return '{qual} ={content} -- end of {qual}\n'.format(qual=qualifier, content=self.newline.join(out))
 
     def __encode(self, obj, dict_name=None):
         s = ''
