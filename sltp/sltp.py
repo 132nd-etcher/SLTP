@@ -66,7 +66,7 @@ class SLTP:
             raise SLTPErrors.ParsingError(ERRORS['unexp_type_str'])
 
         logger.debug('extracting qualifier')
-        qual = re.compile(r'^(?P<value>(dictionary|mission|mapResource)) = ?\n')
+        qual = re.compile(r'^(?P<value>(dictionary|mission|mapResource) = ?)\n')
         match = qual.match(text)
 
         if match is None:
@@ -93,7 +93,7 @@ class SLTP:
         logger.debug('encoding dictionary to text')
         if not obj:
             logger.error('missing object to encode')  # TODO manage error
-            return
+            return '{}\n{{\n}} -- end of {}\n'.format(qualifier, qualifier.replace('=', '').rstrip())
         self.depth = 0
         out = []
         s = self.__encode(obj)
@@ -104,7 +104,7 @@ class SLTP:
                 out.append('{},{}'.format(m.group('intro'), m.group('comment')))
             else:
                 out.append(line)
-        return '{qual} ={content} -- end of {qual}\n'.format(qual=qualifier, content=self.newline.join(out))
+        return '{}{} -- end of {}\n'.format(qualifier, self.newline.join(out), qualifier.replace('=', '').rstrip())
 
     def __encode(self, obj, dict_name=None):
         s = ''
