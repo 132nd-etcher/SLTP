@@ -5,7 +5,7 @@ from setuptools import setup
 # noinspection SpellCheckingInspection
 setup(
     name='SLTP',
-    version='0.0.8',
+    version='0.0.9',
     author='132nd-etcher',
     url='https://github.com/132nd-etcher/sltp',
     packages=['sltp'],

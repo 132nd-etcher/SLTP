@@ -66,7 +66,7 @@ class SLTP:
             raise SLTPErrors.ParsingError(ERRORS['unexp_type_str'])
 
         logger.debug('extracting qualifier')
-        qual = re.compile(r'^(?P<value>(dictionary|mission)) = ?\n')
+        qual = re.compile(r'^(?P<value>(dictionary|mission|mapResource)) = ?\n')
         match = qual.match(text)
 
         if match is None:
